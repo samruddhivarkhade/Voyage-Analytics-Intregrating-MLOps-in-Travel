@@ -5,9 +5,8 @@ from fastapi import HTTPException
 from app.schemas.input_schema import FlightPriceRequest
 from app.services.preprocess import (
     build_feature_vector,
-    encode_categoricals,
-    FEATURE_ORDER,
-    CATEGORICAL_FEATURES,
+    apply_target_encoding,
+    encode_label,
 )
 
 
@@ -24,103 +23,109 @@ def make_request(**overrides):
     return FlightPriceRequest(**defaults)
 
 
-def test_feature_vector_has_correct_shape(mock_encoders):
-    vector = build_feature_vector(make_request(), mock_encoders)
-    assert vector.shape == (1, len(FEATURE_ORDER))
+def test_feature_vector_returns_numpy_array(mock_encoders, mock_target_encodings, mock_selected_features):
+    vector = build_feature_vector(make_request(), mock_encoders, mock_target_encodings, mock_selected_features)
+    assert isinstance(vector, np.ndarray)
 
 
-def test_feature_vector_dtype_is_float(mock_encoders):
-    vector = build_feature_vector(make_request(), mock_encoders)
+def test_feature_vector_dtype_is_float(mock_encoders, mock_target_encodings, mock_selected_features):
+    vector = build_feature_vector(make_request(), mock_encoders, mock_target_encodings, mock_selected_features)
     assert vector.dtype == float
 
 
-def test_feature_vector_preserves_exact_training_order(mock_encoders):
-    request = make_request(
-        flightType="economic",
-        time=4.5,
-        distance=1200.5,
-        agency="Rainbow",
-        gender="male",
-        age=35,
-    )
-    vector = build_feature_vector(request, mock_encoders)
-    expected = np.array([[0.0, 4.5, 1200.5, 2.0, 1.0, 35.0]])
-    np.testing.assert_array_equal(vector, expected)
+def test_feature_vector_has_correct_shape_with_selected_features(mock_encoders, mock_target_encodings, mock_selected_features):
+    vector = build_feature_vector(make_request(), mock_encoders, mock_target_encodings, mock_selected_features)
+    assert vector.shape == (1, len(mock_selected_features))
 
 
-def test_numeric_features_passed_through_unchanged(mock_encoders):
+def test_feature_vector_without_selected_features(mock_encoders, mock_target_encodings):
+    vector = build_feature_vector(make_request(), mock_encoders, mock_target_encodings, selected_features=None)
+    assert vector.shape == (1, 7)
+
+
+def test_numeric_features_passed_through_unchanged(mock_encoders, mock_target_encodings, mock_selected_features):
     request = make_request(distance=9999.99, time=12.34, age=99)
-    vector = build_feature_vector(request, mock_encoders).flatten().tolist()
-    assert vector[1] == 12.34
-    assert vector[2] == 9999.99
-    assert vector[5] == 99.0
+    vector = build_feature_vector(request, mock_encoders, mock_target_encodings, mock_selected_features).flatten()
+    dist_idx = mock_selected_features.index("distance") if "distance" in mock_selected_features else -1
+    time_idx = mock_selected_features.index("time") if "time" in mock_selected_features else -1
+    age_idx = mock_selected_features.index("age") if "age" in mock_selected_features else -1
+    
+    if dist_idx >= 0:
+        assert vector[dist_idx] == 9999.99
+    if time_idx >= 0:
+        assert vector[time_idx] == 12.34
+    if age_idx >= 0:
+        assert vector[age_idx] == 99.0
 
 
-def test_encode_categoricals_returns_integer_values(mock_encoders):
-    encoded = encode_categoricals(make_request(flightType="firstClass", agency="CloudFy", gender="female"), mock_encoders)
-    assert isinstance(encoded["flightType"], int)
-    assert isinstance(encoded["agency"], int)
-    assert isinstance(encoded["gender"], int)
+def test_target_encoding_applied_to_agency(mock_encoders, mock_target_encodings, mock_selected_features):
+    request = make_request(agency="CloudFy")
+    vector = build_feature_vector(request, mock_encoders, mock_target_encodings, mock_selected_features)
+    agency_te_idx = mock_selected_features.index("agency_te") if "agency_te" in mock_selected_features else -1
+    if agency_te_idx >= 0:
+        assert vector[0, agency_te_idx] == 1500.5
 
 
-def test_encode_all_flight_types(mock_encoders):
-    for flight_type, expected in [("economic", 0), ("firstClass", 1), ("premium", 2)]:
-        encoded = encode_categoricals(make_request(flightType=flight_type), mock_encoders)
-        assert encoded["flightType"] == expected
+def test_target_encoding_applied_to_flight_type(mock_encoders, mock_target_encodings, mock_selected_features):
+    request = make_request(flightType="firstClass")
+    vector = build_feature_vector(request, mock_encoders, mock_target_encodings, mock_selected_features)
+    flighttype_te_idx = mock_selected_features.index("flightType_te") if "flightType_te" in mock_selected_features else -1
+    if flighttype_te_idx >= 0:
+        assert vector[0, flighttype_te_idx] == 2500.0
 
 
-def test_encode_all_agencies(mock_encoders):
-    for agency, expected in [("CloudFy", 0), ("FlyingDrops", 1), ("Rainbow", 2)]:
-        encoded = encode_categoricals(make_request(agency=agency), mock_encoders)
-        assert encoded["agency"] == expected
+def test_gender_label_encoding(mock_encoders, mock_target_encodings, mock_selected_features):
+    request = make_request(gender="female")
+    vector = build_feature_vector(request, mock_encoders, mock_target_encodings, mock_selected_features)
+    gender_idx = mock_selected_features.index("gender") if "gender" in mock_selected_features else -1
+    if gender_idx >= 0:
+        assert vector[0, gender_idx] == 0
 
 
-def test_encode_all_genders(mock_encoders):
-    for gender, expected in [("female", 0), ("male", 1)]:
-        encoded = encode_categoricals(make_request(gender=gender), mock_encoders)
-        assert encoded["gender"] == expected
+def test_age_group_calculation_young(mock_encoders, mock_target_encodings, mock_selected_features):
+    request = make_request(age=15)
+    vector = build_feature_vector(request, mock_encoders, mock_target_encodings, mock_selected_features)
+    age_group_idx = mock_selected_features.index("age_group") if "age_group" in mock_selected_features else -1
+    if age_group_idx >= 0:
+        assert vector[0, age_group_idx] == 0
 
 
-def test_unknown_category_raises_http_exception(mock_encoders):
+def test_age_group_calculation_adult(mock_encoders, mock_target_encodings, mock_selected_features):
+    request = make_request(age=35)
+    vector = build_feature_vector(request, mock_encoders, mock_target_encodings, mock_selected_features)
+    age_group_idx = mock_selected_features.index("age_group") if "age_group" in mock_selected_features else -1
+    if age_group_idx >= 0:
+        assert vector[0, age_group_idx] == 2
+
+
+def test_age_group_calculation_senior(mock_encoders, mock_target_encodings, mock_selected_features):
+    request = make_request(age=70)
+    vector = build_feature_vector(request, mock_encoders, mock_target_encodings, mock_selected_features)
+    age_group_idx = mock_selected_features.index("age_group") if "age_group" in mock_selected_features else -1
+    if age_group_idx >= 0:
+        assert vector[0, age_group_idx] == 5
+
+
+def test_unknown_gender_raises_http_exception(mock_encoders, mock_target_encodings, mock_selected_features):
     bad_request = FlightPriceRequest.model_construct(
-        flightType="businessClass",
+        flightType="economic",
         agency="Rainbow",
-        gender="male",
+        gender="unknown_gender",
         distance=1000.0,
         time=3.0,
         age=30,
     )
     with pytest.raises(HTTPException) as exc_info:
-        encode_categoricals(bad_request, mock_encoders)
+        build_feature_vector(bad_request, mock_encoders, mock_target_encodings, mock_selected_features)
     assert exc_info.value.status_code == 422
-    assert exc_info.value.detail["feature"] == "flightType"
 
 
-def test_unknown_category_error_detail_contains_valid_values(mock_encoders):
-    bad_request = FlightPriceRequest.model_construct(
-        flightType="economic",
-        agency="SkyJet",
-        gender="male",
-        distance=1000.0,
-        time=3.0,
-        age=30,
-    )
-    with pytest.raises(HTTPException) as exc_info:
-        encode_categoricals(bad_request, mock_encoders)
-    detail = exc_info.value.detail
-    assert "valid_values" in detail
-    assert "SkyJet" not in detail["valid_values"]
+def test_apply_target_encoding_known_value(mock_target_encodings):
+    result = apply_target_encoding("CloudFy", "agency", mock_target_encodings)
+    assert result == 1500.5
 
 
-def test_unknown_category_error_contains_submitted_value(mock_encoders):
-    bad_request = FlightPriceRequest.model_construct(
-        flightType="economic",
-        agency="Rainbow",
-        gender="unknown",
-        distance=1000.0,
-        time=3.0,
-        age=30,
-    )
-    with pytest.raises(HTTPException) as exc_info:
-        encode_categoricals(bad_request, mock_encoders)
-    assert exc_info.value.detail["value"] == "unknown"
+def test_apply_target_encoding_unknown_value(mock_target_encodings):
+    result = apply_target_encoding("UnknownAgency", "agency", mock_target_encodings)
+    expected_mean = np.mean([1500.5, 1200.8, 1800.3])
+    assert result == expected_mean

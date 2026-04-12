@@ -15,15 +15,39 @@ def mock_model():
 @pytest.fixture
 def mock_encoders():
     encoders = {}
-    for col, classes in [
-        ("flightType", ["economic", "firstClass", "premium"]),
-        ("agency", ["CloudFy", "FlyingDrops", "Rainbow"]),
-        ("gender", ["female", "male"]),
-    ]:
-        le = LabelEncoder()
-        le.fit(classes)
-        encoders[col] = le
+    le = LabelEncoder()
+    le.fit(["female", "male"])
+    encoders["gender"] = le
     return encoders
+
+
+@pytest.fixture
+def mock_target_encodings():
+    return {
+        "agency": {
+            "CloudFy": 1500.5,
+            "FlyingDrops": 1200.8,
+            "Rainbow": 1800.3,
+        },
+        "flightType": {
+            "economic": 1100.0,
+            "firstClass": 2500.0,
+            "premium": 1900.0,
+        },
+    }
+
+
+@pytest.fixture
+def mock_selected_features():
+    return [
+        "agency_te",
+        "flightType_te",
+        "gender",
+        "distance",
+        "time",
+        "age",
+        "age_group",
+    ]
 
 
 @pytest.fixture
@@ -39,9 +63,11 @@ def valid_payload():
 
 
 @pytest.fixture
-def client(mock_model, mock_encoders, monkeypatch):
+def client(mock_model, mock_encoders, mock_target_encodings, mock_selected_features, monkeypatch):
     from app.main import app
     monkeypatch.setattr("app.main.load_model", lambda: mock_model)
     monkeypatch.setattr("app.main.load_encoders", lambda: mock_encoders)
+    monkeypatch.setattr("app.main.load_target_encodings", lambda: mock_target_encodings)
+    monkeypatch.setattr("app.main.load_selected_features", lambda: mock_selected_features)
     with TestClient(app) as c:
         yield c

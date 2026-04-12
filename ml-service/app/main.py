@@ -12,7 +12,7 @@ import time
 
 from app.api.routes import router
 from app.core.config import settings
-from app.services.model_loader import load_model, load_encoders
+from app.services.model_loader import load_model, load_encoders, load_target_encodings, load_selected_features
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -23,6 +23,8 @@ async def lifespan(app: FastAPI):
     logger.info("Loading model and encoders...")
     app.state.model = load_model()
     app.state.encoders = load_encoders()
+    app.state.target_encodings = load_target_encodings()
+    app.state.selected_features = load_selected_features()
     logger.info("Startup complete. Service is ready.")
     yield
     logger.info("Shutting down Flight Price Prediction API.")

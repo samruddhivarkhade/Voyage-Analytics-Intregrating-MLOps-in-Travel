@@ -24,8 +24,10 @@ def predict_flight_price(payload: FlightPriceRequest, request: Request):
 
     model = request.app.state.model
     encoders = request.app.state.encoders
+    target_encodings = request.app.state.target_encodings
+    selected_features = request.app.state.selected_features
 
-    feature_vector = build_feature_vector(payload, encoders)
+    feature_vector = build_feature_vector(payload, encoders, target_encodings, selected_features)
     predicted_price = run_prediction(model, feature_vector)
 
     logger.info("Prediction response | predicted_price=%.4f", predicted_price)
