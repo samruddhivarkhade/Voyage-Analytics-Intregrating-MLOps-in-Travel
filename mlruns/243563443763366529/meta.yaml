@@ -1,0 +1,8 @@
+artifact_location: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/243563443763366529
+creation_time: 1776229037791
+experiment_id: '243563443763366529'
+last_update_time: 1776229037791
+lifecycle_stage: active
+name: gender-classification
+trace_location: null
+workspace: default

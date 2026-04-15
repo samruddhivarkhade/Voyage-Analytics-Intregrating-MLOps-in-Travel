@@ -1,0 +1,10 @@
+artifact_location: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/243563443763366529/models/m-b134a8ac8c5f47668531150c8814c85d/artifacts
+creation_timestamp: 1776229431008
+experiment_id: '243563443763366529'
+last_updated_timestamp: 1776229437867
+model_id: m-b134a8ac8c5f47668531150c8814c85d
+model_type: null
+name: model
+source_run_id: e9f8fe57624d4f40bb20a2f5b5ea450e
+status: 2
+status_message: null

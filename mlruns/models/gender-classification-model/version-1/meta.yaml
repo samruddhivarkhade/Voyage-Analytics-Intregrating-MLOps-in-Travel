@@ -1,0 +1,16 @@
+creation_timestamp: 1776229045850
+current_stage: None
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1776229045850
+model_id: m-35ade2cd224c47b4b4102a6d1482bcc1
+name: gender-classification-model
+run_id: 84384e9e44fa4465871a01af833855d3
+run_link: null
+source: models:/m-35ade2cd224c47b4b4102a6d1482bcc1
+status: READY
+status_message: null
+storage_location: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/243563443763366529/models/m-35ade2cd224c47b4b4102a6d1482bcc1/artifacts
+user_id: null
+version: 1
+workspace: default

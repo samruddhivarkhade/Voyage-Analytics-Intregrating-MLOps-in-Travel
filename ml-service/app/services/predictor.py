@@ -1,6 +1,7 @@
 import numpy as np
 from app.utils.logger import get_logger
-
+import joblib
+from app.core.config import settings
 logger = get_logger(__name__)
 
 
@@ -13,31 +14,22 @@ def run_prediction(model, feature_vector: np.ndarray) -> float:
 
 
 
-
-
-
-
-
-import joblib
-
-
-
-
-
 # Load gender model once
-gender_model = joblib.load("models/gender_model.pkl")
-gender_encoder = joblib.load("models/gender_encoder.pkl")
-
-
-
-
-
-
-
-
+gender_model = joblib.load(settings.gender_model_path)
+gender_encoder = joblib.load(settings.gender_encoder_path)
 
 def predict_gender(feature_vector: np.ndarray) -> str:
-    pred = gender_model.predict(feature_vector)[0]
+    dict_data = feature_vector
+
+    result = dict_data.values()
+
+    print("RESULT  : " , result)
+
+    data = list(result)
+
+    np_arr = np.array(data,dtype=np.float64)
+
+    pred = gender_model.predict([np_arr])
     gender = gender_encoder.inverse_transform([pred])[0]
 
     logger.info("Predicted gender: %s", gender)

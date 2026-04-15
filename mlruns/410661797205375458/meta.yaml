@@ -1,0 +1,8 @@
+artifact_location: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/410661797205375458
+creation_time: 1776228631173
+experiment_id: '410661797205375458'
+last_update_time: 1776228631173
+lifecycle_stage: active
+name: flight-price-prediction
+trace_location: null
+workspace: default

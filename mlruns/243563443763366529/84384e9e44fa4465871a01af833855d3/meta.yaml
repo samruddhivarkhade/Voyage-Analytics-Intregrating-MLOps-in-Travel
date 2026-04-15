@@ -1,0 +1,14 @@
+artifact_uri: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/243563443763366529/84384e9e44fa4465871a01af833855d3/artifacts
+end_time: 1776229045888
+entry_point_name: ''
+experiment_id: '243563443763366529'
+lifecycle_stage: active
+run_id: 84384e9e44fa4465871a01af833855d3
+run_name: gender-classification-training
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776229038941
+status: 3
+tags: []
+user_id: Viraj Gavade

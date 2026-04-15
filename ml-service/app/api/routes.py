@@ -52,7 +52,7 @@ def predict_gender_api(payload: GenderRequest, request: Request):
         payload.model_dump(),
     )
 
-    feature_vector = build_gender_feature_vector(payload.model_dump())
+    feature_vector =payload.model_dump()
     predicted_gender = predict_gender(feature_vector)
 
     logger.info("Gender prediction response | gender=%s", predicted_gender)

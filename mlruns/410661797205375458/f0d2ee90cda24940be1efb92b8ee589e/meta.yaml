@@ -1,0 +1,14 @@
+artifact_uri: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/410661797205375458/f0d2ee90cda24940be1efb92b8ee589e/artifacts
+end_time: 1776228637333
+entry_point_name: ''
+experiment_id: '410661797205375458'
+lifecycle_stage: active
+run_id: f0d2ee90cda24940be1efb92b8ee589e
+run_name: LinearRegression
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776228637139
+status: 3
+tags: []
+user_id: Viraj Gavade
