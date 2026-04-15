@@ -1,0 +1,14 @@
+artifact_uri: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/410661797205375458/68d2ec99a9d24c0491aa66f81ce22204/artifacts
+end_time: 1776228637516
+entry_point_name: ''
+experiment_id: '410661797205375458'
+lifecycle_stage: active
+run_id: 68d2ec99a9d24c0491aa66f81ce22204
+run_name: Ridge
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776228637342
+status: 3
+tags: []
+user_id: Viraj Gavade

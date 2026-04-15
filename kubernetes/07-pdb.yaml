@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: voyage-ml-service-pdb
+  namespace: voyage-ml
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: voyage-ml-service

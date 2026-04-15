@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ml-service-config
+  namespace: voyage-ml
+data:
+  MLFLOW_TRACKING_URI: "http://mlflow-server:5000"
+  LOG_LEVEL: "INFO"
+  # MODEL_URI can be set to load flight price model from MLflow registry
+  # e.g. "models:/flight-price-model/Production"
+  MODEL_URI: ""
+  # GENDER_MODEL_URI can be set to load gender classification model from MLflow registry
+  # e.g. "models:/gender-classification-model/Production"
+  GENDER_MODEL_URI: ""

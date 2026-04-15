@@ -1,0 +1,16 @@
+creation_timestamp: 1776228663365
+current_stage: None
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1776228663365
+model_id: m-7ee061b5c0044111aee03fea3ad1baa2
+name: flight-price-model
+run_id: 94e7299bc98e49a4ab47963ab4fcb249
+run_link: null
+source: models:/m-7ee061b5c0044111aee03fea3ad1baa2
+status: READY
+status_message: null
+storage_location: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/410661797205375458/models/m-7ee061b5c0044111aee03fea3ad1baa2/artifacts
+user_id: null
+version: 1
+workspace: default

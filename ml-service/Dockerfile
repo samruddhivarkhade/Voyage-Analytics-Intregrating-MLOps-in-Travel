@@ -1,12 +1,18 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1 \
+	PYTHONUNBUFFERED=1 \
+	PIP_NO_CACHE_DIR=1
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR /srv/ml-service
 
-COPY app/ ./app/
-COPY models/ ./models/
+# Build with repository root as context:
+# docker build -f ml-service/Dockerfile -t voyage-ml-service:latest .
+COPY ml-service/requirements.txt ./requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+COPY ml-service/app ./app
+COPY models /srv/models
 
 EXPOSE 8000
 

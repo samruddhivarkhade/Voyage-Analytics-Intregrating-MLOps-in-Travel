@@ -1,0 +1,8 @@
+{
+  "model": "LogisticRegression",
+  "accuracy": 0.3445692883895131,
+  "mlflow_tracking_uri": "file:./mlruns",
+  "mlflow_experiment": "gender-classification",
+  "mlflow_registered_model": "gender-classification-model",
+  "mlflow_model_uri": "models:/m-b134a8ac8c5f47668531150c8814c85d"
+}

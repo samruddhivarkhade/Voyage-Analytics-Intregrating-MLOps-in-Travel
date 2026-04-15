@@ -1,0 +1,14 @@
+artifact_uri: file:E:/Voyage-Analytics-Intregrating-MLOps-in-Travel/mlruns/410661797205375458/1b5227722d324d2ba9a840649920def3/artifacts
+end_time: 1776228657690
+entry_point_name: ''
+experiment_id: '410661797205375458'
+lifecycle_stage: active
+run_id: 1b5227722d324d2ba9a840649920def3
+run_name: GradientBoosting
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776228650988
+status: 3
+tags: []
+user_id: Viraj Gavade
