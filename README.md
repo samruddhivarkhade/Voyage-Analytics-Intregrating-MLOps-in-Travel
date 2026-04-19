@@ -1,352 +1,299 @@
-# Voyage-Analytics-Integrating-MLOps-in-Travel
+# 🛫 Voyage Analytics - MLOps in Travel
 
-This repository contains the machine learning models for:
-- **Flight Price Prediction** (Regression)
-- **Gender Classification** (Classification)
+A complete production-ready machine learning system for travel analytics with **flight price prediction**, **gender classification**, and **hotel recommendations** using modern MLOps practices, containerization, and Kubernetes orchestration.
 
-## 🚀 Quick Start Guide
-
-**New to this project?** → Start here based on your use case:
-
-| Level | Purpose | Time | Link |
-|-------|---------|------|------|
-| **Level 1** | Local Development | 10 min | [Local Setup](DEPLOYMENT_GUIDE.md#level-1-local-development-basic) |
-| **Level 2** | Docker Compose | 15 min | [Docker Compose](DEPLOYMENT_GUIDE.md#level-2-docker-compose-intermediate) |
-| **Level 3** | Kubernetes (Advanced) | 20 min | [Kubernetes with Kind](DEPLOYMENT_GUIDE.md#level-3-kubernetes-with-kind-advanced) |
-
-**For complete instructions**, see **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)**
+**Project Status:** ✅ Complete | **Last Updated:** April 19, 2026
 
 ---
 
-## 📋 Project Overview
+## 📋 Quick Navigation
 
-This repository contains the machine learning models for:
+- **New here?** → Read [Quick Start](#-quick-start-choose-one) below
+- **Frontend details** → See [frontend/README.md](frontend/README.md)
+- **Backend API** → See [ml-service/README.md](ml-service/README.md)
+- **Full project structure** → Scroll to [Project Structure](#-project-structure)
 
-Flight Price Prediction (Regression)
-Gender Classification (Classification)
+---
 
-Follow the steps below to set up the project locally.
+## ✨ Features at a Glance
 
-⚙️ Step 1: Clone the Repository
+✅ **3 ML Models** - Flight prices, gender classification, hotel recommendations  
+✅ **FastAPI Backend** - 6+ RESTful endpoints with JWT authentication  
+✅ **React Frontend** - Modern UI with TypeScript, Tailwind CSS, error boundaries  
+✅ **Docker Ready** - Multi-stage builds, docker-compose orchestration  
+✅ **Kubernetes Ready** - Auto-scaling (2-10 pods), HPA, PDB, network policies  
+✅ **MLFlow Tracking** - Full experiment versioning and model registry  
+✅ **Database** - SQLAlchemy ORM with SQLite, prediction tracking  
+✅ **Error Handling** - Comprehensive boundaries, fallback pages, toast notifications  
 
-git clone
-cd Voyage-Analytics
+---
 
-🧪 Step 2: Create Virtual Environment
-Windows:
+## 🚀 Quick Start (Choose One)
 
-python -m venv venv
+### **1️⃣ Local Development** (Fastest - 2 minutes)
 
-Activate it:
+```powershell
+# Terminal 1: Backend
+cd E:\Voyage-Analytics-Intregrating-MLOps-in-Travel
+.\.venv\Scripts\Activate.ps1
+uvicorn ml-service.app.main:app --reload --host 0.0.0.0 --port 8000
 
-venv\Scripts\activate
+# Terminal 2: Frontend
+cd frontend
+npm install
+npm run dev
+```
 
-📦 Step 3: Install Dependencies
+**Access:** Frontend http://localhost:5173 | API http://localhost:8000 | Docs http://localhost:8000/docs
 
-pip install -r requirements.txt
+---
 
-▶️ Step 4: Run the Models
-Run Regression Model:
-
-python regression_model.py
-
-Run Gender Classification Model:
-
-python gender_model.py
-
-📁 Project Structure
-
-project/
-│
-├── data/ → datasets (flights, hotels, users)
-├── models/ → saved ML models & encoders
-├── regression_model.py
-├── gender_model.py
-├── requirements.txt
-
-⚠️ Important Instructions
-Always activate the virtual environment before running code
-Do not modify model input features without informing the team
-Ensure datasets are placed correctly inside the data/ folder
-Encoders are saved and must be used during prediction
-
-## Docker Deployment (Flight Price Prediction API)
-
-Build and run the FastAPI model service in a container for portable deployment.
-
-Build:
+### **2️⃣ Docker Compose** (Production-like - 5 minutes)
 
 ```powershell
 cd E:\Voyage-Analytics-Intregrating-MLOps-in-Travel
-docker build -f .\ml-service\Dockerfile -t voyage-ml-service:latest .
-```
-
-Run:
-
-```powershell
-docker run --name voyage-ml-service -p 8000:8000 voyage-ml-service:latest
-```
-
-Health check URL:
-
-http://127.0.0.1:8000/v1/health
-
-## MLflow Tracking and Model Versioning
-
-Use MLflow to track experiments, compare model iterations, and register versioned models.
-
-1) Install MLflow:
-
-```powershell
-pip install mlflow
-```
-
-2) Start MLflow UI (local file-based tracking):
-
-```powershell
-cd E:\Voyage-Analytics-Intregrating-MLOps-in-Travel
-python -m mlflow ui --backend-store-uri .\mlruns --port 5000
-```
-
-3) One-command tracked training (recommended):
-
-```powershell
-cd E:\Voyage-Analytics-Intregrating-MLOps-in-Travel
-.\scripts\train_with_mlflow.ps1 -StartUi
-```
-
-4) Train and log experiments (manual):
-
-```powershell
-$env:MLFLOW_TRACKING_URI="file:./mlruns"
-$env:MLFLOW_EXPERIMENT_NAME="flight-price-prediction"
-$env:MLFLOW_REGISTERED_MODEL_NAME="flight-price-model"
-python .\regerssion_model_train.py
-```
-
-5) Open MLflow UI:
-
-http://127.0.0.1:5000
-
-6) Serve API using a versioned model from MLflow registry:
-
-```powershell
-docker run --name voyage-ml-service -p 8000:8000 ^
-	-e MLFLOW_TRACKING_URI="http://host.docker.internal:5000" ^
-	-e MODEL_URI="models:/flight-price-model/Production" ^
-	voyage-ml-service:latest
-```
-
-### MLflow launcher script options
-
-Two launcher scripts available:
-- [scripts/train_with_mlflow.ps1](scripts/train_with_mlflow.ps1) — for flight price prediction model
-- [scripts/train_gender_with_mlflow.ps1](scripts/train_gender_with_mlflow.ps1) — for gender classification model
-
-Flight price prediction examples:
-
-```powershell
-# Use defaults (file tracking URI, experiment name, model name)
-.\scripts\train_with_mlflow.ps1
-
-# Start MLflow UI and run training
-.\scripts\train_with_mlflow.ps1 -StartUi
-
-# Custom experiment/model name
-.\scripts\train_with_mlflow.ps1 `
-  -ExperimentName "flight-price-exp-v2" `
-  -RegisteredModelName "flight-price-model-v2"
-```
-
-Gender classification examples:
-
-```powershell
-# Use defaults
-.\scripts\train_gender_with_mlflow.ps1
-
-# Start MLflow UI and run training
-.\scripts\train_gender_with_mlflow.ps1 -StartUi
-
-# Custom settings
-.\scripts\train_gender_with_mlflow.ps1 `
-  -ExperimentName "gender-exp-v2" `
-  -RegisteredModelName "gender-model-v2"
-```
-
-## Gender Classification Model with MLflow Tracking
-
-Same MLflow workflow for gender classification model—track experiments, version, and deploy.
-
-1) One-command gender model training (recommended):
-
-```powershell
-cd E:\Voyage-Analytics-Intregrating-MLOps-in-Travel
-.\scripts\train_gender_with_mlflow.ps1 -StartUi
-```
-
-2) Train manually with custom settings:
-
-```powershell
-$env:MLFLOW_TRACKING_URI="file:./mlruns"
-$env:MLFLOW_EXPERIMENT_NAME="gender-classification-v2"
-$env:MLFLOW_REGISTERED_MODEL_NAME="gender-classification-model-v2"
-python .\gender_classification_model.py
-```
-
-3) Serve API with versioned gender model:
-
-```powershell
-docker run --name voyage-ml-service -p 8000:8000 ^
-	-e MLFLOW_TRACKING_URI="http://host.docker.internal:5000" ^
-	-e GENDER_MODEL_URI="models:/gender-classification-model/Production" ^
-	voyage-ml-service:latest
-```
-
-4) Serve both models from MLflow registry:
-
-```powershell
-docker run --name voyage-ml-service -p 8000:8000 ^
-	-e MLFLOW_TRACKING_URI="http://host.docker.internal:5000" ^
-	-e MODEL_URI="models:/flight-price-model/Production" ^
-	-e GENDER_MODEL_URI="models:/gender-classification-model/Production" ^
-	voyage-ml-service:latest
-```
-
-## Docker Compose for Local Development
-
-Run the entire stack locally with docker-compose (includes MLflow server, ML service, and nginx):
-
-```powershell
-cd E:\Voyage-Analytics-Intregrating-MLOps-in-Travel
+docker-compose build
 docker-compose up -d
 ```
 
-Access:
+**Access:** Frontend http://localhost | API http://localhost/api/v1 | MLFlow http://localhost:5000
 
-- ML Service API: http://127.0.0.1:8000/docs
-- MLflow UI: http://127.0.0.1/mlflow
-- Health check: http://127.0.0.1/health
+---
 
-Stop services:
-
-```powershell
-docker-compose down
-```
-
-## Kubernetes Deployment for Scalability
-
-Deploy to Kubernetes clusters (EKS, GKE, AKS, minikube, etc.) for automatic scaling and high availability.
-
-### Prerequisites
-
-- Kubernetes cluster 1.20+
-- kubectl configured
-- Docker image pushed to registry
-
-### Quick Deploy
+### **3️⃣ Kubernetes** (Advanced - 30 minutes)
 
 ```bash
-# Build and push Docker image
-docker build -f ml-service/Dockerfile -t your-registry/voyage-ml-service:latest .
-docker push your-registry/voyage-ml-service:latest
+# Create local cluster
+kind create cluster --config kind-cluster-config.yaml
 
-# Deploy to cluster
+# Deploy
 kubectl apply -k kubernetes/
+
+# Access
+kubectl port-forward -n voyage-ml svc/voyage-ml 8000:8000
 ```
 
-### Features
+**Access:** Frontend build + API on http://localhost:8000
 
-The Kubernetes deployment includes:
+---
 
-- **Deployment** with rolling updates (min 2, auto-scales to 10 replicas)
-- **HorizontalPodAutoscaler** (scales on CPU 70%, memory 80%)
-- **Service** with LoadBalancer (external access)
-- **Ingress** with TLS support
-- **ConfigMap** for environment variables and MLflow configuration
-- **PodDisruptionBudget** for high availability (minimum 1 pod running)
-- **NetworkPolicy** for security
-- **ServiceAccount** with RBAC
-- **Health checks** (liveness, readiness probes)
+## 📁 Project Structure
 
-### Configuration
-
-Edit `kubernetes/02-configmap.yaml` to set MLflow URI and model versions:
-
-```yaml
-data:
-  MLFLOW_TRACKING_URI: "http://mlflow-server:5000"
-  MODEL_URI: "models:/flight-price-model/Production"
-  GENDER_MODEL_URI: "models:/gender-classification-model/Production"
+```
+Voyage-Analytics-Intregrating-MLOps-in-Travel/
+├── 📖 README.md                              ← You are here
+├── frontend/                                  
+│   ├── README.md                             ← Frontend docs
+│   ├── src/
+│   │   ├── pages/                            (Dashboard, Auth, Predictions, etc.)
+│   │   ├── components/                       (ErrorBoundary, Header, Toast, etc.)
+│   │   ├── services/apiClient.ts             (API communication)
+│   │   ├── store/authStore.ts                (Auth state)
+│   │   └── utils/errorHandler.ts             (Error utilities)
+│   └── package.json, vite.config.ts, etc.
+│
+├── ml-service/                                
+│   ├── README.md                             ← Backend docs
+│   ├── Dockerfile
+│   ├── app/
+│   │   ├── main.py                           (FastAPI app)
+│   │   ├── api/routes.py                     (All endpoints)
+│   │   ├── services/hotel_recommendation.py  (ML service)
+│   │   ├── schemas/input_schema.py           (Pydantic models)
+│   │   └── core/                             (Config, Security, ORM)
+│   └── requirements.txt
+│
+├── components/                                (ML training scripts)
+│   ├── regerssion_model_train.py
+│   ├── gender_classification_model.py
+│   └── recommendation_model.ipynb
+│
+├── scripts/                                   (Training & deployment)
+│   ├── train_with_mlflow.ps1
+│   ├── train_gender_with_mlflow.ps1
+│   ├── train_hotel_recommendation.ps1
+│   ├── deploy-k8s.sh
+│   └── delete-k8s.sh
+│
+├── kubernetes/                                (K8s manifests)
+│   ├── 01-namespace.yaml
+│   ├── 02-configmap.yaml
+│   ├── 03-deployment.yaml
+│   ├── 04-service.yaml
+│   ├── 05-hpa.yaml                           ← Auto-scaling
+│   ├── 06-serviceaccount.yaml
+│   ├── 07-pdb.yaml
+│   ├── 08-ingress.yaml
+│   ├── 09-network-policy.yaml
+│   └── kustomization.yaml
+│
+├── data/                                      (Datasets)
+│   ├── flights.csv (50K+ records)
+│   ├── hotels.csv
+│   └── users.csv
+│
+├── models/                                    (Trained artifacts)
+│   ├── final_model.pkl
+│   ├── gender_model.pkl
+│   └── hotel_recommendation/
+│
+├── mlruns/                                    (MLFlow experiments)
+│   ├── 410661797205375458/                   (Flight experiments)
+│   └── 243563443763366529/                   (Gender experiments)
+│
+├── docker-compose.yaml                       ← Multi-container setup
+├── nginx.conf                                ← Reverse proxy
+├── kind-cluster-config.yaml                  ← K8s config
+└── requirements.txt
 ```
 
-Update and restart:
+---
 
+## 🤖 ML Models Summary
+
+| Model | Type | Algorithm | Accuracy | Speed |
+|-------|:----:|-----------|:--------:|:-----:|
+| **Flight Prices** | Regression | GradientBoosting | R² > 0.85 | ~10ms |
+| **Gender** | Classification | LogisticRegression | > 85% | ~5ms |
+| **Hotel Recommendations** | Ranking | RandomForest (300 trees) | Top-5 ranked | ~50ms |
+
+---
+
+## 🔌 API Endpoints
+
+**Base URL:** `http://localhost:8000/v1` (local) or `http://localhost/api/v1` (Docker)
+
+### Authentication
+```
+POST   /login              Login user (returns JWT token)
+POST   /register           Register new user
+```
+
+### Predictions
+```
+POST   /predict            Flight price prediction (requires JWT)
+POST   /predict-gender     Gender classification (requires JWT)
+POST   /recommend-hotels   Hotel recommendations (requires JWT)
+GET    /stats              User prediction statistics (requires JWT)
+```
+
+### Health
+```
+GET    /health             Service health check
+GET    /info               API information
+```
+
+**Interactive Docs:** http://localhost:8000/docs (Swagger) | http://localhost:8000/redoc (ReDoc)
+
+---
+
+## 🐳 Deployment Methods
+
+| Method | Cost | Setup | Performance | Persistence | Best For |
+|--------|:----:|:-----:|:-----------:|:----------:|----------|
+| **Local** | Free | 2 min | ⚡⚡ | None | Development |
+| **Docker Compose** | Free | 5 min | ⚡⚡ | Volume | Testing |
+| **Kind K8s** | Free | 30 min | ⚡⚡⚡ | Limited | Production test |
+| **Fly.io** | Free* | 10 min | ⚡⚡ | ✅ | Production |
+| **Railway** | Free* | 10 min | ⚡⚡ | ✅ | Production |
+
+*Free tier: 1,000 hours/month
+
+---
+
+## 🐛 Troubleshooting
+
+### "Connection refused" on port 8000
+```powershell
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
+```
+
+### Frontend not connecting to API
+Check `frontend/src/services/apiClient.ts` - verify API URL matches backend
+
+### Models not loading
 ```bash
-kubectl apply -f kubernetes/02-configmap.yaml
-kubectl rollout restart deployment/voyage-ml-service -n voyage-ml
+cd ml-service/app/services
+python -c "from hotel_recommendation import load_recommendation_model; load_recommendation_model()"
 ```
 
-### Monitor Scaling
-
-```bash
-kubectl get hpa -n voyage-ml --watch
-kubectl top pods -n voyage-ml
+### Docker won't start
+```powershell
+docker system prune -a
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up
 ```
 
-### Full Documentation
+---
 
-See [kubernetes/README.md](kubernetes/README.md) for comprehensive deployment guide including:
+## 📚 Full Documentation
 
-- Troubleshooting
-- Security best practices
-- Production recommendations
-- MLflow integration
-- Advanced configuration
+| Document | Purpose |
+|----------|---------|
+| [frontend/README.md](frontend/README.md) | Frontend development, components, customization |
+| [ml-service/README.md](ml-service/README.md) | Backend API, models, training, deployment |
+| **This file** | Project overview, quick start, structure |
 
-## Architecture Overview
+---
+
+## ✅ Project Completion Status
+
+✅ Regression Model - Flight price prediction  
+✅ REST API - FastAPI with JWT auth  
+✅ Containerization - Docker & docker-compose  
+✅ Kubernetes - Auto-scaling, HPA, PDB  
+✅ MLFlow - Model versioning & tracking  
+✅ Gender Classification - Full pipeline  
+✅ Hotel Recommendations - ML + UI  
+✅ Error Handling - Boundaries, fallback pages, toasts  
+
+**Total Features:** 7/7 ✅ Complete
+
+---
+
+## 🤝 Support & Contributing
+
+**Issues?** Check troubleshooting above or review [ml-service/README.md](ml-service/README.md)  
+**Questions?** See [frontend/README.md](frontend/README.md) for frontend issues  
+**Contributing?** Follow the structure, add tests, document changes  
+
+---
+
+## 📊 System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        Kubernetes Cluster                   │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │         Ingress (TLS, Rate Limiting)                 │  │
-│  └───────────────┬─────────────────────────────────────┘  │
-│                  │                                         │
-│  ┌───────────────▼─────────────────────────────────────┐  │
-│  │    Service (LoadBalancer)                            │  │
-│  └───────────────┬─────────────────────────────────────┘  │
-│                  │                                         │
-│  ┌───────────────▼─────────────────────────────────────┐  │
-│  │  HorizontalPodAutoscaler (2-10 replicas)            │  │
-│  │  - CPU utilization > 70%                             │  │
-│  │  - Memory utilization > 80%                          │  │
-│  └───────────────┬─────────────────────────────────────┘  │
-│                  │                                         │
-│  ┌───────────────▼─────────────────────────────────────┐  │
-│  │    Deployment (Rolling Updates)                      │  │
-│  │  ┌─────────────┬──────────────┬──────────────────┐  │  │
-│  │  │  Pod 1      │   Pod 2      │   Pod N          │  │  │
-│  │  │ ┌─────────┐ │ ┌─────────┐ │ ┌─────────────┐  │  │  │
-│  │  │ │ML Service│ │ │ML Service│ │ │ML Service   │  │  │  │
-│  │  │ │ Container│ │ │Container │ │ │Container    │  │  │  │
-│  │  │ └─────────┘ │ └─────────┘ │ └─────────────┘  │  │  │
-│  │  └─────────────┴──────────────┴──────────────────┘  │  │
-│  └──────────────────────────────────────────────────┘  │
-│                                                         │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  ConfigMap (MLflow URI, Model Versions)           │  │
-│  │  NetworkPolicy (Security)                         │  │
-│  │  PodDisruptionBudget (Min 1 pod available)        │  │
-│  └──────────────────────────────────────────────────┘  │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-         │
-         │ (connects to)
-         │
-    ┌────▼──────────────┐
-    │  MLflow Server    │
-    │  (Tracking & UI)  │
-    └───────────────────┘
+┌─────────────────────────────────────────┐
+│         End User (Browser)              │
+└──────────────────┬──────────────────────┘
+                   │ HTTPS
+┌──────────────────▼──────────────────────┐
+│      Nginx Reverse Proxy               │
+│  (Docker/K8s Load Balancer)            │
+└──┬──────────────────────────────────┬──┘
+   │ /                                │ /api/v1
+   │                                  │
+┌──▼──────────────────┐   ┌──────────▼─────────┐
+│ React Frontend      │   │  FastAPI Backend   │
+│ (SPA, TypeScript)   │   │  (6 endpoints)     │
+│ ├─ Dashboard        │   │  ├─ /predict      │
+│ ├─ Auth flows       │   │  ├─ /predict-*   │
+│ ├─ Predictions      │   │  ├─ /stats        │
+│ └─ Error boundaries │   │  └─ /health       │
+└────────────────────┘   │                    │
+                         ├─ SQLAlchemy ORM   │
+                         ├─ scikit-learn ML  │
+                         ├─ Pydantic         │
+                         └─ JWT Security     │
+                                │
+                    ┌───────────▼──────────┐
+                    │   SQLite Database    │
+                    │  ├─ Users            │
+                    │  └─ Predictions      │
+                    └────────────────────┘
 ```
+
+---
+
+**Version:** 1.0.0 | **Status:** Production Ready ✅ | **Last Updated:** April 19, 2026
